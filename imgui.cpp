@@ -7555,12 +7555,17 @@ bool ImGui::IsWindowAbove(ImGuiWindow* potential_above, ImGuiWindow* potential_b
     return false;
 }
 
-bool ImGui::IsWindowHovered(ImGuiHoveredFlags flags)
+bool ImGui::IsWindowHovered(ImGuiHoveredFlags flags, ImGuiWindow* window)
 {
     IM_ASSERT((flags & (ImGuiHoveredFlags_AllowWhenOverlapped | ImGuiHoveredFlags_AllowWhenDisabled)) == 0);   // Flags not supported by this function
     ImGuiContext& g = *GImGui;
     ImGuiWindow* ref_window = g.HoveredWindow;
-    ImGuiWindow* cur_window = g.CurrentWindow;
+
+    // We add this section so that we can pass out own window.
+    ImGuiWindow* cur_window = nullptr;
+    if(window) cur_window = window;
+    else cur_window = g.CurrentWindow;
+
     if (ref_window == NULL)
         return false;
 
