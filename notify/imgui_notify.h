@@ -12,7 +12,7 @@
 #define NOTIFY_PADDING_X				20.f		// Bottom-left X padding
 #define NOTIFY_PADDING_Y				20.f		// Bottom-left Y padding
 #define NOTIFY_PADDING_MESSAGE_Y		10.f		// Padding Y between each message
-#define NOTIFY_FADE_IN_OUT_TIME			150			// Fade in and out duration
+#define NOTIFY_FADE_IN_OUT_TIME			1000.f		// Fade in and out duration
 #define NOTIFY_DEFAULT_DISMISS			3000		// Auto dismiss after X ms (default, applied only of no data provided in constructors)
 #define NOTIFY_OPACITY					1.0f		// 0-1 Toast opacity
 #define NOTIFY_TOAST_FLAGS				ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoFocusOnAppearing
@@ -28,7 +28,6 @@ typedef int ImGuiToastPhase;
 typedef int ImGuiToastPos;
 
 #include <Windows.h>
-
 #include "notify_icons_raw.h"
 #include "notify_icons_define.h"
 #include "../imgui.h"
