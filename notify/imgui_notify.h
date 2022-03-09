@@ -27,7 +27,8 @@ typedef int ImGuiToastType;
 typedef int ImGuiToastPhase;
 typedef int ImGuiToastPos;
 
-#include "notify_icons.h"
+#include "notify_icons_raw.h"
+#include "notify_icons_define.h"
 #include "../imgui.h"
 #include "../imgui_internal.h"
 
