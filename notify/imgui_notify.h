@@ -20,12 +20,14 @@
 #define NOTIFY_USE_SEPARATOR
 
 #define NOTIFY_INLINE					inline
-#define NOTIFY_NULL_OR_EMPTY(str)		(!str ||! strlen(str))
+#define NOTIFY_NULL_OR_EMPTY(str)		(!str.size())
 #define NOTIFY_FORMAT(fn, format, ...)	if (format) { va_list args; va_start(args, format); fn(format, args, __VA_ARGS__); va_end(args); }
 
 typedef int ImGuiToastType;
 typedef int ImGuiToastPhase;
 typedef int ImGuiToastPos;
+
+#include <Windows.h>
 
 #include "notify_icons_raw.h"
 #include "notify_icons_define.h"
@@ -255,11 +257,11 @@ namespace ImGui
 			}
 
 			// Get icon, title and other data
-			const auto icon = current_toast->get_icon();
-			const auto title = current_toast->get_title();
-			const auto content = current_toast->get_content();
-			const auto default_title = current_toast->get_default_title();
-			const auto opacity = current_toast->get_fade_percent(); // Get opacity based of the current phase
+			std::string icon = std::string(current_toast->get_icon());
+			std::string title = std::string(current_toast->get_title());
+			std::string content = std::string(current_toast->get_content());
+			std::string default_title = current_toast->get_default_title();
+			float opacity = current_toast->get_fade_percent(); // Get opacity based of the current phase
 
 			// Window rendering
 			auto text_color = current_toast->get_color();
@@ -284,7 +286,7 @@ namespace ImGui
 				if (!NOTIFY_NULL_OR_EMPTY(icon))
 				{
 					//Text(icon); // Render icon text
-					TextColored(text_color, icon);
+					TextColored(text_color, icon.c_str());
 					was_title_rendered = true;
 				}
 
@@ -295,7 +297,7 @@ namespace ImGui
 					if (!NOTIFY_NULL_OR_EMPTY(icon))
 						SameLine();
 
-					Text(title); // Render title text
+					Text(title.c_str()); // Render title text
 					was_title_rendered = true;
 				}
 				else if (!NOTIFY_NULL_OR_EMPTY(default_title))
@@ -303,7 +305,7 @@ namespace ImGui
 					if (!NOTIFY_NULL_OR_EMPTY(icon))
 						SameLine();
 
-					Text(default_title); // Render default title text (ImGuiToastType_Success -> "Success", etc...)
+					Text(default_title.c_str()); // Render default title text (ImGuiToastType_Success -> "Success", etc...)
 					was_title_rendered = true;
 				}
 
@@ -323,7 +325,7 @@ namespace ImGui
 #endif
 					}
 
-					Text(content); // Render content text
+					Text(content.c_str()); // Render content text
 				}
 
 				PopTextWrapPos();
