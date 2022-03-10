@@ -239,6 +239,10 @@ namespace ImGui
 	/// </summary>
 	NOTIFY_INLINE void RenderNotifications()
 	{
+        // Notification style.
+        PushStyleVar(ImGuiStyleVar_WindowRounding, 5.f);
+        PushStyleColor(ImGuiCol_WindowBg, ImVec4(43.f / 255.f, 43.f / 255.f, 43.f / 255.f, 100.f / 255.f));
+
         // Rendering data.
         ImGuiStyle& style = ImGui::GetStyle();
         ImVec4 globalTextColor = style.Colors[ImGuiCol_Text];
@@ -272,10 +276,13 @@ namespace ImGui
 			char window_name[50];
 			sprintf_s(window_name, "##TOAST%d", i);
 
+            // Proper fading.
             PushStyleColor(ImGuiCol_Border, {0.f, 0.f, 0.f, opacity});
             PushStyleColor(ImGuiCol_Separator, { 0.f, 0.f, 0.f, opacity });
             PushStyleColor(ImGuiCol_Text, { globalTextColor.x, globalTextColor.y, globalTextColor.z, opacity });
 			SetNextWindowBgAlpha(opacity);
+
+            // Begin the notification.
 			SetNextWindowPos(ImVec2(vp_size.x - NOTIFY_PADDING_X, vp_size.y - NOTIFY_PADDING_Y - height), ImGuiCond_Always, ImVec2(1.0f, 1.0f));
 			Begin(window_name, NULL, NOTIFY_TOAST_FLAGS);
 
@@ -343,6 +350,10 @@ namespace ImGui
             PopStyleColor();
             PopStyleColor();
 		}
+
+        // End notification style.
+        PopStyleColor();
+        PopStyleVar();
 	}
 
 	/// <summary>
