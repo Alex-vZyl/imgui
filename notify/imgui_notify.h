@@ -1,9 +1,5 @@
-// imgui-notify by patrickcjk
-// https://github.com/patrickcjk/imgui-notify
-
 #pragma once
 
-#pragma once
 #include <vector>
 #include <string>
 
@@ -14,9 +10,7 @@
 #define NOTIFY_FADE_IN_OUT_TIME			1000.f		// Fade in and out duration
 #define NOTIFY_DEFAULT_DISMISS			3000		// Auto dismiss after X ms (default, applied only of no data provided in constructors)
 #define NOTIFY_OPACITY					1.0f		// 0-1 Toast opacity
-#define NOTIFY_TOAST_FLAGS				ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoFocusOnAppearing
-// Comment out if you don't want any separator between title and content
-#define NOTIFY_USE_SEPARATOR
+#define NOTIFY_TOAST_FLAGS				ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoFocusOnAppearing
 
 #define NOTIFY_INLINE					inline
 #define NOTIFY_NULL_OR_EMPTY(str)		(!str.size())
@@ -71,27 +65,28 @@ private:
 	char			content[NOTIFY_MAX_MSG_LENGTH];
 	int				dismiss_time = NOTIFY_DEFAULT_DISMISS;
 	uint64_t		creation_time = 0;
+    unsigned        m_ID = 0;
+
+    // Used to create unique notifications.
+    inline static unsigned NotificationCount = 0;
 
 private:
+
 	// Setters
-
 	NOTIFY_INLINE auto set_title(const char* format, va_list args) { vsnprintf(this->title, sizeof(this->title), format, args); }
-
 	NOTIFY_INLINE auto set_content(const char* format, va_list args) { vsnprintf(this->content, sizeof(this->content), format, args); }
 
 public:
 
 	NOTIFY_INLINE auto set_title(const char* format, ...) -> void { NOTIFY_FORMAT(this->set_title, format); }
-
 	NOTIFY_INLINE auto set_content(const char* format, ...) -> void { NOTIFY_FORMAT(this->set_content, format); }
-
 	NOTIFY_INLINE auto set_type(const ImGuiToastType& type) -> void { IM_ASSERT(type < ImGuiToastType_COUNT); this->type = type; };
 
 public:
+
 	// Getters
-
-	NOTIFY_INLINE auto get_title() -> char* { return this->title; };
-
+    NOTIFY_INLINE auto get_title() -> char* { return this->title; };
+    NOTIFY_INLINE unsigned get_ID() { return m_ID; }
 	NOTIFY_INLINE std::string get_default_title()
 	{
 		if (!strlen(this->title))
@@ -110,12 +105,9 @@ public:
 				return "Info";
 			}
 		}
-
 		return this->title;
 	};
-
 	NOTIFY_INLINE auto get_type() -> const ImGuiToastType& { return this->type; };
-
 	NOTIFY_INLINE auto get_color() -> const ImVec4&
 	{
 		switch (this->type)
@@ -132,7 +124,6 @@ public:
 			return { 0, 157, 255, 255 }; // Blue
 		}
 	}
-
 	NOTIFY_INLINE auto get_icon() -> const char*
 	{
 		switch (this->type)
@@ -149,11 +140,8 @@ public:
 			return ICON_FA_INFO_CIRCLE;
 		}
 	}
-
 	NOTIFY_INLINE auto get_content() -> char* { return this->content; };
-
 	NOTIFY_INLINE auto get_elapsed_time() { return GetTickCount64() - this->creation_time; }
-
 	NOTIFY_INLINE auto get_phase() -> const ImGuiToastPhase&
 	{
 		const auto elapsed = get_elapsed_time();
@@ -175,12 +163,10 @@ public:
 			return ImGuiToastPhase_FadeIn;
 		}
 	}
-
 	NOTIFY_INLINE auto get_fade_percent() -> const float
 	{
 		const auto phase = get_phase();
 		const auto elapsed = get_elapsed_time();
-
 		if (phase == ImGuiToastPhase_FadeIn)
 		{
 			return ((float)elapsed / (float)NOTIFY_FADE_IN_OUT_TIME) * NOTIFY_OPACITY;
@@ -189,13 +175,12 @@ public:
 		{
 			return (1.f - (((float)elapsed - (float)NOTIFY_FADE_IN_OUT_TIME - (float)this->dismiss_time) / (float)NOTIFY_FADE_IN_OUT_TIME)) * NOTIFY_OPACITY;
 		}
-
 		return 1.f * NOTIFY_OPACITY;
 	}
 
 public:
-	// Constructors
 
+	// Constructors
 	ImGuiToast(ImGuiToastType type, int dismiss_time = NOTIFY_DEFAULT_DISMISS)
 	{
 		IM_ASSERT(type < ImGuiToastType_COUNT);
@@ -206,39 +191,43 @@ public:
 
 		memset(this->title, 0, sizeof(this->title));
 		memset(this->content, 0, sizeof(this->content));
+
+        // Assign ID.
+        m_ID = ImGuiToast::NotificationCount++;
 	}
-
-	ImGuiToast(ImGuiToastType type, const char* format, ...) : ImGuiToast(type) { NOTIFY_FORMAT(this->set_content, format); }
-
-	ImGuiToast(ImGuiToastType type, int dismiss_time, const char* format, ...) : ImGuiToast(type, dismiss_time) { NOTIFY_FORMAT(this->set_content, format); }
+	ImGuiToast(ImGuiToastType type, const char* format, ...)
+        : ImGuiToast(type)
+    {
+        NOTIFY_FORMAT(this->set_content, format);
+    }
+	ImGuiToast(ImGuiToastType type, int dismiss_time, const char* format, ...)
+        : ImGuiToast(type, dismiss_time)
+    {
+        NOTIFY_FORMAT(this->set_content, format);
+    }
 };
 
 namespace ImGui
 {
 	NOTIFY_INLINE std::vector<ImGuiToast> notifications;
 
-	/// <summary>
 	/// Insert a new toast in the list
-	/// </summary>
 	NOTIFY_INLINE void InsertNotification(const ImGuiToast& toast)
 	{
 		notifications.push_back(toast);
 	}
 
-	/// <summary>
 	/// Remove a toast from the list by its index
-	/// </summary>
-	/// <param name="index">index of the toast to remove</param>
 	NOTIFY_INLINE void RemoveNotification(int index)
 	{
 		notifications.erase(notifications.begin() + index);
 	}
 
-	/// <summary>
 	/// Render toasts, call at the end of your rendering!
-	/// </summary>
 	NOTIFY_INLINE void RenderNotifications()
 	{
+        if (!notifications.size()) return;
+
         // Notification style.
         PushStyleVar(ImGuiStyleVar_WindowRounding, 5.f);
         PushStyleColor(ImGuiCol_WindowBg, ImVec4(43.f / 255.f, 43.f / 255.f, 43.f / 255.f, 100.f / 255.f));
@@ -246,7 +235,7 @@ namespace ImGui
         // Rendering data.
         ImGuiStyle& style = ImGui::GetStyle();
         ImVec4 globalTextColor = style.Colors[ImGuiCol_Text];
-		const auto vp_size = GetMainViewport()->Size;
+		auto vp_size = GetMainViewport()->Size;
 		float height = 0.f;
 
         // Render notifications.
@@ -257,11 +246,11 @@ namespace ImGui
 			// Remove toast if expired
 			if (current_toast->get_phase() == ImGuiToastPhase_Expired)
 			{
-				RemoveNotification(i);
+				RemoveNotification(i--);
 				continue;
 			}
 
-			// Get icon, title and other data
+			// Get data.
 			std::string icon = std::string(current_toast->get_icon());
 			std::string title = std::string(current_toast->get_title());
 			std::string content = std::string(current_toast->get_content());
@@ -274,7 +263,7 @@ namespace ImGui
 
 			// Generate new unique name for this toast
 			char window_name[50];
-			sprintf_s(window_name, "##TOAST%d", i);
+			sprintf_s(window_name, "##TOAST%d", current_toast->get_ID());
 
             // Proper fading.
             PushStyleColor(ImGuiCol_Border, {0.f, 0.f, 0.f, opacity});
@@ -283,12 +272,12 @@ namespace ImGui
 			SetNextWindowBgAlpha(opacity);
 
             // Begin the notification.
-			SetNextWindowPos(ImVec2(vp_size.x - NOTIFY_PADDING_X, vp_size.y - NOTIFY_PADDING_Y - height), ImGuiCond_Always, ImVec2(1.0f, 1.0f));
-			Begin(window_name, NULL, NOTIFY_TOAST_FLAGS);
-
+            SetNextWindowPos({vp_size.x - NOTIFY_PADDING_X, vp_size.y - NOTIFY_PADDING_Y - height}, 0, {1.0f, 1.0f});
+            Begin(window_name, NULL, NOTIFY_TOAST_FLAGS);
 			// Here we render the toast content
 			{
-				PushTextWrapPos(vp_size.x / 3.f); // We want to support multi-line text, this will wrap the text after 1/3 of the screen width
+                // Wrap text 1/4 screen width.
+                PushTextWrapPos(vp_size.x / 4.f);
 
 				bool was_title_rendered = false;
 
@@ -310,6 +299,7 @@ namespace ImGui
 					Text(title.c_str()); // Render title text
 					was_title_rendered = true;
 				}
+
 				else if (!NOTIFY_NULL_OR_EMPTY(default_title))
 				{
 					if (!NOTIFY_NULL_OR_EMPTY(icon))
@@ -321,31 +311,23 @@ namespace ImGui
 
 				// In case ANYTHING was rendered in the top, we want to add a small padding so the text (or icon) looks centered vertically
 				if (was_title_rendered && !NOTIFY_NULL_OR_EMPTY(content))
-				{
 					SetCursorPosY(GetCursorPosY() + 5.f); // Must be a better way to do this!!!!
-				}
 
 				// If a content is set
 				if (!NOTIFY_NULL_OR_EMPTY(content))
 				{
-					if (was_title_rendered)
-					{
-#ifdef NOTIFY_USE_SEPARATOR
-						Separator();
-#endif
-					}
-
-					Text(content.c_str()); // Render content text
+					Separator();
+					Text(content.c_str());
 				}
 
-				PopTextWrapPos();
+                PopTextWrapPos();
+
+		        // Save height for next toasts
+		        height += GetWindowHeight() + NOTIFY_PADDING_MESSAGE_Y;
 			}
 
-			// Save height for next toasts
-			height += GetWindowHeight() + NOTIFY_PADDING_MESSAGE_Y;
-
 			// End
-			End();
+         	End();
             PopStyleColor();
             PopStyleColor();
             PopStyleColor();
@@ -356,10 +338,7 @@ namespace ImGui
         PopStyleVar();
 	}
 
-	/// <summary>
 	/// Adds font-awesome font, must be called ONCE on initialization
-	/// <param name="FontDataOwnedByAtlas">Fonts are loaded from read-only memory, should be set to false!</param>
-	/// </summary>
 	NOTIFY_INLINE void MergeIconsWithLatestFont(float font_size, bool FontDataOwnedByAtlas = false)
 	{
 		static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
