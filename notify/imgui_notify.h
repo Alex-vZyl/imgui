@@ -10,7 +10,7 @@
 #define NOTIFY_FADE_IN_OUT_TIME			1000.f		// Fade in and out duration
 #define NOTIFY_DEFAULT_DISMISS			3000		// Auto dismiss after X ms (default, applied only of no data provided in constructors)
 #define NOTIFY_OPACITY					1.0f		// 0-1 Toast opacity
-#define NOTIFY_TOAST_FLAGS				ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoFocusOnAppearing
+#define NOTIFY_TOAST_FLAGS				ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoFocusOnAppearing
 
 #define NOTIFY_INLINE					inline
 #define NOTIFY_NULL_OR_EMPTY(str)		(!str.size())
