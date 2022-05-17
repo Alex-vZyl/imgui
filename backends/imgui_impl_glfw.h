@@ -25,6 +25,10 @@
 #pragma once
 #include "imgui.h"      // IMGUI_IMPL_API
 
+// Fix some keycodes causing this implementation to break.
+// This causes some keycodes to not be used!
+#define __EMSCRIPTEN__
+
 struct GLFWwindow;
 struct GLFWmonitor;
 
