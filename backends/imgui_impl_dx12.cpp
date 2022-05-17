@@ -3,9 +3,9 @@
 
 // Implemented features:
 //  [X] Renderer: User texture binding. Use 'D3D12_GPU_DESCRIPTOR_HANDLE' as ImTextureID. Read the FAQ about ImTextureID!
-//  [X] Renderer: Multi-viewport support. Enable with 'io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable'.
+//  [X] Renderer: Multi-viewport support (multiple windows). Enable with 'io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable'.
 //      FIXME: The transition from removing a viewport and moving the window in an existing hosted viewport tends to flicker.
-//  [X] Renderer: Support for large meshes (64k+ vertices) with 16-bit indices.
+//  [X] Renderer: Large meshes support (64k+ vertices) with 16-bit indices.
 
 // Important: to compile on 32-bit systems, this backend requires code to be compiled with '#define ImTextureID ImU64'.
 // This is because we need ImTextureID to carry a 64-bit value and by default ImTextureID is defined as void*.
@@ -544,6 +544,7 @@ bool    ImGui_ImplDX12_CreateDeviceObjects()
         param[1].DescriptorTable.pDescriptorRanges = &descRange;
         param[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
+        // Bilinear sampling is required by default. Set 'io.Fonts->Flags |= ImFontAtlasFlags_NoBakedLines' or 'style.AntiAliasedLinesUseTex = false' to allow point/nearest sampling.
         D3D12_STATIC_SAMPLER_DESC staticSampler = {};
         staticSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
         staticSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;

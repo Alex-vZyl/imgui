@@ -3,8 +3,8 @@
 
 // Implemented features:
 //  [X] Renderer: User texture binding. Use 'ID3D10ShaderResourceView*' as ImTextureID. Read the FAQ about ImTextureID!
-//  [X] Renderer: Multi-viewport support. Enable with 'io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable'.
-//  [X] Renderer: Support for large meshes (64k+ vertices) with 16-bit indices.
+//  [X] Renderer: Multi-viewport support (multiple windows). Enable with 'io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable'.
+//  [X] Renderer: Large meshes support (64k+ vertices) with 16-bit indices.
 
 // You can use unmodified imgui_impl_* files in your project. See examples/ folder for examples of using this.
 // Prefer including the entire imgui/ repository into your project (either as a copy or as a submodule), and only build the backends you need.
@@ -343,6 +343,7 @@ static void ImGui_ImplDX10_CreateFontsTexture()
     io.Fonts->SetTexID((ImTextureID)bd->pFontTextureView);
 
     // Create texture sampler
+    // (Bilinear sampling is required by default. Set 'io.Fonts->Flags |= ImFontAtlasFlags_NoBakedLines' or 'style.AntiAliasedLinesUseTex = false' to allow point/nearest sampling)
     {
         D3D10_SAMPLER_DESC desc;
         ZeroMemory(&desc, sizeof(desc));
