@@ -720,7 +720,7 @@ bool ImGui::Button(const char* label, const ImVec2& size_arg)
     return ButtonEx(label, size_arg, ImGuiButtonFlags_None);
 }
 
-bool ImGui::BeginButtonDropDown(const char* label, ImVec2 buttonSize)
+bool ImGui::BeginButtonDropDown(const char* label, const ImVec2& buttonSize)
 {
     ImGui::SameLine(0.f, 0.f);
 
