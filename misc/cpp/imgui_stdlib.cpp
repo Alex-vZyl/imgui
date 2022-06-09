@@ -71,7 +71,7 @@ bool ImGui::InputTextWithHint(const char* label, const char* hint, std::string* 
     return InputTextWithHint(label, hint, (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
 }
 
-bool ImGui::Combo(const char* label, int* current_item, const std::vector<std::string>& items, int popup_max_height_in_items = -1);
+bool ImGui::Combo(const char* label, int* current_item, const std::vector<std::string>& items, int popup_max_height_in_items)
 {
 	constexpr char nullTerminator = '\0';
 
@@ -80,7 +80,7 @@ bool ImGui::Combo(const char* label, int* current_item, const std::vector<std::s
 	for (auto& item : items) itemsCharLength += item.size();
 
 	// Create zero seperated string.
-	char* memory = (char*)malloc(itemsCharLength + items.size() + 1, sizeof(char));
+	char* memory = (char*)malloc(( itemsCharLength + items.size() + 1 ) * sizeof(char));
 	int index = 0;
 	for (auto& item : items)
 	{
@@ -91,6 +91,6 @@ bool ImGui::Combo(const char* label, int* current_item, const std::vector<std::s
 
 	// Render.
 	bool selected = ImGui::Combo(label, current_item, (const char*)memory, popup_max_height_in_items);
-	free((void*)memory);
+	free(memory);
 	return selected;
 }
