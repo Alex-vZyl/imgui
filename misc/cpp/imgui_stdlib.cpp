@@ -71,7 +71,7 @@ bool ImGui::InputTextWithHint(const char* label, const char* hint, std::string* 
     return InputTextWithHint(label, hint, (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
 }
 
-bool  ImGui::Combo(const char* label, int* current_item, const std::vector<std::string>& items, int popup_max_height_in_items = -1);
+bool ImGui::Combo(const char* label, int* current_item, const std::vector<std::string>& items, int popup_max_height_in_items = -1);
 {
 	constexpr char nullTerminator = '\0';
 
@@ -84,7 +84,7 @@ bool  ImGui::Combo(const char* label, int* current_item, const std::vector<std::
 	int index = 0;
 	for (auto& item : items)
 	{
-		for (auto& c : item) memory[index++] = c;
+		for (auto c : item) memory[index++] = c;
 		memory[index++] = nullTerminator;
 	}
 	memory[index++] = nullTerminator;
